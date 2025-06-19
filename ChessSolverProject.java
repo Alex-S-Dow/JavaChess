@@ -3,17 +3,15 @@ package com.mycompany.chesssolverproject;
 import java.awt.*;
 import javax.swing.*;
 
-/**
- *
- * @author alexs
- * “I certify that the codes/answers of this assignment are entirely my own work.”
- */
+//Main class that pulls the necessary jPanel from the created chessboard class and can be used to modify the main jFrame
+
 public class ChessSolverProject {
 
     public static void main(String[] args) {
         Chessboard board = new Chessboard();
         int size = 700;
         JFrame f = new JFrame("Chess");
+        //Gets the chessboard's jPanel and adds it to the jFrame
         f.add(board.getGUI());
         f.setSize(size, size);
         f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
