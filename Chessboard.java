@@ -1,10 +1,8 @@
 package com.mycompany.chesssolverproject;
 
-/**
- *
- * @author alexs
- * “I certify that the codes/answers of this assignment are entirely my own work.”
- */
+//Actual Chessboard class where the game logic is done
+
+//May have to change some of the imports for the PieceType's and Board graph based on where the are in the project/IDE.
 import com.mycompany.chesssolverproject.BoardGraph.BoardState;
 import static com.mycompany.chesssolverproject.PieceType.bishop;
 import static com.mycompany.chesssolverproject.PieceType.king;
@@ -27,30 +25,38 @@ enum PieceType {king, queen, rook, knight, bishop, pawn, none}
 enum PlayerColor {white, black, none}
 
 public class Chessboard {
+	//jPanel that will be pulled by the main class and added to the jFrame
     private final JPanel startGUI = new JPanel(new BorderLayout(3, 3));
+	//jPanel that represents the actual board with an 8x8 gridLayout, added to the startGui in initialization
     private JPanel chessboard = new JPanel(new GridLayout(0, 8));
-    //Arrays to represent the board
+    
+	//Arrays to represent the board
     private JButton[][] chessboardsquares = new JButton[8][8];
     private Piece[][] chessboardstatus = new Piece[8][8];
     private int[][] squarevalue;
+	
     //Arrays to hold the images of each piece
     private ImageIcon[] w_pieceImages = new ImageIcon[7];
     private ImageIcon[] b_pieceImages = new ImageIcon[7];
+	
     //Holds the total value of players pieces
     private int w_pieceValue = 0;
     private int b_pieceValue = 0;
+	
     //boolean to switch between playing with someone or against the computer
     boolean TwoPlayers = true;
     //boolean used when promoting a pawn
     boolean promoting = false;
+	//JLabel Array to hold labels for the toolbar
     private JLabel[] messages = {new JLabel("Click Reset to Start"), new JLabel("Click Computer to play against the Computer"), new JLabel("Difficulty")};
-    private int difficulty = 0;
-    //Variable that the game will use for the computer
+    //Variable used for the toolbar difficulty button
+	private int difficulty = 0;
+    //Variable that the game will use to determine the computers difficulty. Will not change during the game
     private int gameDifficulty = 0;
     private boolean computerGame = false;
     //Variables held to help the computer algorithms
     BoardGraph gamemoves = new BoardGraph();
-    //Storage for data to graph some metrics
+    //Storage for data to graph some metrics, used for my Algorithms project, can be discarded if not needed.
     ArrayList<Long> moveTimes = new ArrayList<>();
     ArrayList<Integer> graphSize = new ArrayList<>();
     
@@ -58,7 +64,7 @@ public class Chessboard {
         InitPieceImages();
         InitBoardStatus();
         InitGUI();
-        //Initializes the value of each square
+        //Initializes the value of each square, used for the computer algorithms
         int[][] sqvalue = {
                 {28, 32, 34, 34, 34, 34, 32, 28},
                 {32, 39, 43, 43, 43, 43, 39, 32},
@@ -71,7 +77,7 @@ public class Chessboard {
         };
         squarevalue = sqvalue;
     }
-    //Sets up the board with pieces in the entire array.
+    //Sets up the board with null pieces. Basically empty squares
     public final void InitBoardStatus() {
         for(int i = 0; i < chessboardstatus.length; i++) {
             for(int j = 0; j < chessboardstatus[i].length; j++) {
@@ -102,37 +108,42 @@ public class Chessboard {
     }
     //Loads image from the resource folder src/main/resource/ChessPieceImages
     private ImageIcon loadImage(String filename) {
+		//May need to change the exact path name if your images are stored in a different location, may need some trial and error
         URL imgURL = getClass().getClassLoader().getResource("ChessPieceImages/" + filename);
         return new ImageIcon(new ImageIcon(imgURL).getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH));
     }
-    //Sets up the GUI to start the game and what to add to the JFrame in the main
+    //Sets up the GUI to start the game and what to add to the JFrame in the main class
     public final void InitGUI() {
         //Set up the start GUI
         startGUI.setBorder(new EmptyBorder(5, 5, 5, 5));
+		//Adds a toolbar
         JToolBar tools = new JToolBar();
         tools.setFloatable(false); //Makes the toolbar immovable
         startGUI.add(tools, BorderLayout.PAGE_START); //Adds the toolbar to the GUI panel
-        //Start button for the game
+        
+		//Start button for the game
         JButton startButton = new JButton("Reset");
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //System.out.println(moveTimes);
-                //System.out.println(graphSize);
+				//Clears some variables used for my project, can be cut if not needed
                 gamemoves.clear();
                 moveTimes.clear();
                 graphSize.clear();
+				//Sets the board with each piece in the starting position
                 setBoard();
             }
 	});
         //Adds the startButton to the toolbar
         tools.add(startButton);
         tools.addSeparator();
-        tools.add(messages[0]);
-        tools.addSeparator(new Dimension(20, 0));
-        //Button that changes whether you are playing against the computer or anohter person
+        tools.add(messages[0]); //Adds the appropiate jLabel for the button on the toolbar
+        tools.addSeparator(new Dimension(20, 0)); //Adds some space between labels and buttons on the toolbar
+		
+        //Button that changes whether you are playing against the computer or another person
         JButton computerButton = new JButton("Computer");
         computerButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            //Changes the text color if you are playing against the compter or not
+			public void actionPerformed(ActionEvent e) {
                 TwoPlayers = !TwoPlayers;
                 if(!TwoPlayers) {
                     computerButton.setForeground(Color.red);
@@ -145,8 +156,9 @@ public class Chessboard {
         //Adds the compuerButton to the toolbar
         tools.add(computerButton);
         tools.addSeparator();
-        tools.add(messages[1]);
-        tools.addSeparator(new Dimension(5, 0));
+        tools.add(messages[1]); //Adds the appropiate jLabel for the button on the toolbar
+        tools.addSeparator(new Dimension(5, 0)); //Adds some space between labels and buttons on the toolbar
+		
         //Button that changes the algorithm the computer uses
         JButton difficultyButton = new JButton("Easy");
         difficultyButton.setForeground(Color.green);
@@ -172,8 +184,9 @@ public class Chessboard {
 	});
         //Adds the difficultyButton to the toolbar
         tools.add(difficultyButton);
-        tools.addSeparator(new Dimension(2, 0));
-        tools.add(messages[2]);
+		tools.add(messages[2]); //Adds the appropiate jLabel for the button on the toolbar
+        tools.addSeparator(new Dimension(2, 0)); //Adds some space between labels and buttons on the toolbar
+        
         //Adds the chessboard to the GUI
         startGUI.add(chessboard);
         chessboard.setBorder(new LineBorder(Color.BLACK));
@@ -181,6 +194,8 @@ public class Chessboard {
         ImageIcon defaultIcon = new ImageIcon(new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB));
         //Will make the buttons right next to each other
         Insets buttonMargin = new Insets(0,0,0,0);
+		
+		//Iterate through chessboardsquares to add the buttons for our game logic
         for(int i = 0; i < chessboardsquares.length; i++) {
             for(int j = 0; j < chessboardsquares[i].length; j++) {
                 JButton b = new JButton();
@@ -196,7 +211,7 @@ public class Chessboard {
                 chessboardsquares[j][i] = b;
             }
         }
-        //Acutally adds the buttons to the board
+        //Iterates through chessbaordsquares to add them to the chessboard jPanel
         for(int i = 0; i < chessboardsquares.length; i++) {
             for(int j = 0; j < chessboardsquares[i].length; j++) {
                 chessboard.add(chessboardsquares[j][i]);
