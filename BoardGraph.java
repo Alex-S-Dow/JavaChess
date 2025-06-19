@@ -1,10 +1,7 @@
 package com.mycompany.chesssolverproject;
 
-/**
- *
- * @author alexs
- * “I certify that the codes/answers of this assignment are entirely my own work.”
- */
+//Class that represents a graph of the moves taken during the game, used for some of the computer algorithms to decide between moves
+
 import java.util.*;
 import com.mycompany.chesssolverproject.Chessboard.Piece;
 
